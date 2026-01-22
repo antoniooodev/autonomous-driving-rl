@@ -57,11 +57,21 @@ class Logger:
         """Log metrics to CSV file."""
         row = {"step": step, **metrics}
         
-        # Initialize CSV on first write
-        if self.csv_writer is None:
-            self.csv_fields = list(row.keys())
+        # Initialize or reinitialize CSV if new fields appear
+        if self.csv_writer is None or not set(row.keys()).issubset(set(self.csv_fields)):
+            # Close existing file if open
+            if self.csv_file:
+                self.csv_file.close()
+            
+            # Merge new fields with existing ones
+            if self.csv_fields:
+                all_fields = list(self.csv_fields) + [k for k in row.keys() if k not in self.csv_fields]
+            else:
+                all_fields = list(row.keys())
+            
+            self.csv_fields = all_fields
             self.csv_file = open(self.csv_path, 'w', newline='')
-            self.csv_writer = csv.DictWriter(self.csv_file, fieldnames=self.csv_fields)
+            self.csv_writer = csv.DictWriter(self.csv_file, fieldnames=self.csv_fields, extrasaction='ignore')
             self.csv_writer.writeheader()
         
         self.csv_writer.writerow(row)
