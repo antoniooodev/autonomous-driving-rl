@@ -1,0 +1,23 @@
+# DQN configuration
+algorithm:
+  name: "dqn"
+
+  # Network
+  hidden_dims: [256, 256]
+
+  # Learning
+  learning_rate: 0.0005
+  gamma: 0.99
+
+  # Exploration
+  epsilon_start: 1.0
+  epsilon_end: 0.05
+  epsilon_decay_steps: 50000
+
+  # Replay buffer
+  buffer_size: 100000
+  batch_size: 64
+  learning_starts: 1000
+
+  # Target network
+  target_update_freq: 100
