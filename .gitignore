@@ -1,0 +1,38 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Virtual environments
+venv/
+env/
+.env/
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# Results and outputs
+results/logs/
+results/checkpoints/
+results/plots/*.png
+results/tables/*.csv
+
+# Weights (keep directory, ignore large files)
+weights/*.pth
+weights/*.pt
+!weights/.gitkeep
+
+# Jupyter
+.ipynb_checkpoints/
+notebooks/*.ipynb
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Misc
+*.log
+*.tmp
