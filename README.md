@@ -44,7 +44,7 @@ autonomous-driving-rl/
 ├── report/                 # LaTeX report
 ├── training.py             # Main training entry point
 ├── evaluate.py             # Main evaluation entry point
-└── your_baseline.py        # Baseline entry point
+└── baseline.py        # Baseline entry point
 ```
 
 ---
