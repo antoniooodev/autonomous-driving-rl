@@ -1,130 +1,153 @@
 """
-Main training entry point for the Autonomous Driving RL project.
+Training script for autonomous driving RL agents.
 
 Usage:
     python training.py
-    python training.py --algorithm dqn
-    python training.py --algorithm ppo --config configs/algorithms/ppo.yaml
+    python training.py --algorithm dqn --max_steps 100000
 """
 
 import gymnasium
 import highway_env
-import numpy as np
-import torch
-import random
 import argparse
 from pathlib import Path
 
-# Project imports (uncomment as implemented)
-# from src.utils.config import load_config
-# from src.utils.logger import Logger
-# from src.utils.seed import set_seed
-# from src.agents import DQNAgent, DoubleDQNAgent, DuelingDQNAgent, D3QNAgent, PPOAgent
+from src.utils import set_seed, Logger
+from src.agents import DQNAgent
 
 
 def parse_args():
-    parser = argparse.ArgumentParser(description='Train RL agent for autonomous driving')
+    parser = argparse.ArgumentParser()
     parser.add_argument('--algorithm', type=str, default='dqn',
-                        choices=['dqn', 'double_dqn', 'dueling_dqn', 'd3qn', 'ppo'],
-                        help='RL algorithm to use')
-    parser.add_argument('--config', type=str, default='configs/default.yaml',
-                        help='Path to configuration file')
-    parser.add_argument('--max_steps', type=int, default=100000,
-                        help='Maximum training steps')
-    parser.add_argument('--seed', type=int, default=0,
-                        help='Random seed')
-    parser.add_argument('--render', action='store_true',
-                        help='Render environment during training')
+                        choices=['dqn', 'double_dqn', 'dueling_dqn', 'd3qn', 'ppo'])
+    parser.add_argument('--max_steps', type=int, default=100000)
+    parser.add_argument('--seed', type=int, default=0)
+    parser.add_argument('--eval_freq', type=int, default=5000)
+    parser.add_argument('--save_freq', type=int, default=10000)
+    parser.add_argument('--log_freq', type=int, default=100)
     return parser.parse_args()
 
 
-def set_seed(seed: int):
-    """Set seed for reproducibility."""
-    np.random.seed(seed)
-    random.seed(seed)
-    torch.manual_seed(seed)
-    if torch.cuda.is_available():
-        torch.cuda.manual_seed(seed)
-        torch.cuda.manual_seed_all(seed)
-        torch.backends.cudnn.deterministic = True
-        torch.backends.cudnn.benchmark = False
+def create_env(env_name: str, config: dict):
+    """Create highway environment."""
+    return gymnasium.make(env_name, config=config)
 
 
-def create_env(env_name: str, config: dict, render: bool = False):
-    """Create and configure the highway environment."""
-    render_mode = 'human' if render else None
-    env = gymnasium.make(env_name, config=config, render_mode=render_mode)
-    return env
+def evaluate_agent(agent, env_name: str, config: dict, n_episodes: int = 5):
+    """Evaluate agent over n episodes."""
+    env = create_env(env_name, config)
+    returns = []
+    
+    for _ in range(n_episodes):
+        state, _ = env.reset()
+        state = state.reshape(-1)
+        episode_return = 0
+        done, truncated = False, False
+        
+        while not (done or truncated):
+            action = agent.select_action(state, evaluate=True)
+            state, reward, done, truncated, _ = env.step(action)
+            state = state.reshape(-1)
+            episode_return += reward
+        
+        returns.append(episode_return)
+    
+    env.close()
+    return sum(returns) / len(returns)
 
 
-def get_agent(algorithm: str, state_dim: int, action_dim: int, config: dict):
-    """Factory function to create the appropriate agent."""
-    # TODO: Implement agent creation
-    raise NotImplementedError(f"Agent '{algorithm}' not yet implemented")
+def get_agent(algorithm: str, state_dim: int, action_dim: int):
+    """Create agent based on algorithm name."""
+    if algorithm == 'dqn':
+        return DQNAgent(state_dim, action_dim)
+    else:
+        raise NotImplementedError(f"Algorithm '{algorithm}' not yet implemented")
 
 
 def train(args):
     """Main training loop."""
-    # Set seed for reproducibility
     set_seed(args.seed)
     
-    # Environment configuration
+    # Environment config
     env_config = {
         'action': {'type': 'DiscreteMetaAction'},
         'lanes_count': 3,
         'vehicles_count': 50,
         'duration': 40,
-        'ego_spacing': 1.5,
     }
     
-    # Create environment
-    env_name = "highway-fast-v0"  # Fast version for training
-    env = create_env(env_name, env_config, render=args.render)
+    # Create training env
+    env = create_env("highway-fast-v0", env_config)
+    state_dim = env.observation_space.shape[0] * env.observation_space.shape[1]
+    action_dim = env.action_space.n
     
-    # Get dimensions
-    state_dim = np.prod(env.observation_space.shape)  # Flattened: 5*5 = 25
-    action_dim = env.action_space.n  # 5 actions
-    
-    print(f"Environment: {env_name}")
-    print(f"State dimension: {state_dim}")
-    print(f"Action dimension: {action_dim}")
-    print(f"Algorithm: {args.algorithm}")
-    print(f"Max steps: {args.max_steps}")
+    print(f"State dim: {state_dim}, Action dim: {action_dim}")
+    print(f"Algorithm: {args.algorithm}, Max steps: {args.max_steps}")
     print("-" * 50)
     
-    # Initialize agent
-    # agent = get_agent(args.algorithm, state_dim, action_dim, config={})
-    agent = None  # Placeholder
+    # Create agent and logger
+    agent = get_agent(args.algorithm, state_dim, action_dim)
+    logger = Logger("results/logs", experiment_name=args.algorithm)
     
-    # TODO: Implement training loop
-    raise NotImplementedError("Training loop not yet implemented")
+    # Training
+    state, _ = env.reset()
+    state = state.reshape(-1)
     
-    # Training loop structure:
-    # state, _ = env.reset()
-    # state = state.reshape(-1)
-    # 
-    # for step in range(args.max_steps):
-    #     # Select action
-    #     action = agent.select_action(state)
-    #     
-    #     # Environment step
-    #     next_state, reward, done, truncated, info = env.step(action)
-    #     next_state = next_state.reshape(-1)
-    #     
-    #     # Store transition and train
-    #     agent.store_transition(state, action, reward, next_state, done)
-    #     agent.train_step()
-    #     
-    #     state = next_state
-    #     
-    #     if done or truncated:
-    #         state, _ = env.reset()
-    #         state = state.reshape(-1)
-    #
-    # # Save final model
-    # agent.save('weights/best_model.pth')
+    episode = 1
+    episode_return = 0
+    episode_steps = 0
+    
+    for step in range(1, args.max_steps + 1):
+        # Select and execute action
+        action = agent.select_action(state)
+        next_state, reward, done, truncated, _ = env.step(action)
+        next_state = next_state.reshape(-1)
+        
+        # Store and train
+        agent.store_transition(state, action, reward, next_state, done)
+        metrics = agent.train_step()
+        
+        state = next_state
+        episode_return += reward
+        episode_steps += 1
+        
+        # Episode end
+        if done or truncated:
+            print(f"Step {step:6d} | Episode {episode:3d} | Return: {episode_return:7.2f} | Steps: {episode_steps}")
+            
+            logger.log({
+                "train/episode_return": episode_return,
+                "train/episode_length": episode_steps,
+                "train/epsilon": agent.epsilon
+            }, step)
+            
+            state, _ = env.reset()
+            state = state.reshape(-1)
+            episode += 1
+            episode_return = 0
+            episode_steps = 0
+        
+        # Log training metrics
+        if metrics and step % args.log_freq == 0:
+            logger.log({f"train/{k}": v for k, v in metrics.items()}, step)
+        
+        # Evaluation
+        if step % args.eval_freq == 0:
+            eval_return = evaluate_agent(agent, "highway-fast-v0", env_config)
+            print(f"[EVAL] Step {step} | Avg Return: {eval_return:.2f}")
+            logger.log({"eval/return": eval_return}, step)
+        
+        # Save checkpoint
+        if step % args.save_freq == 0:
+            Path("results/checkpoints").mkdir(parents=True, exist_ok=True)
+            agent.save(f"results/checkpoints/{args.algorithm}_step{step}.pth")
+    
+    # Save final model
+    Path("weights").mkdir(parents=True, exist_ok=True)
+    agent.save("weights/best_model.pth")
+    print(f"\nTraining complete. Model saved to weights/best_model.pth")
     
     env.close()
+    logger.close()
 
 
 if __name__ == "__main__":
