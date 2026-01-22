@@ -12,7 +12,7 @@ import argparse
 from pathlib import Path
 
 from src.utils import set_seed, Logger
-from src.agents import DQNAgent
+from src.agents import DQNAgent, DoubleDQNAgent, DuelingDQNAgent, D3QNAgent
 
 
 def parse_args():
@@ -59,6 +59,12 @@ def get_agent(algorithm: str, state_dim: int, action_dim: int):
     """Create agent based on algorithm name."""
     if algorithm == 'dqn':
         return DQNAgent(state_dim, action_dim)
+    elif algorithm == 'double_dqn':
+        return DoubleDQNAgent(state_dim, action_dim)
+    elif algorithm == 'dueling_dqn':
+        return DuelingDQNAgent(state_dim, action_dim)
+    elif algorithm == 'd3qn':
+        return D3QNAgent(state_dim, action_dim)
     else:
         raise NotImplementedError(f"Algorithm '{algorithm}' not yet implemented")
 
