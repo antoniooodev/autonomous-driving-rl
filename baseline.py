@@ -8,8 +8,8 @@ This implements a Time-To-Collision (TTC) based policy that:
 4. Accelerates when safe
 
 Usage:
-    python your_baseline.py
-    python your_baseline.py --episodes 10
+    python baseline.py
+    python baseline.py --episodes 10
 """
 
 import gymnasium
