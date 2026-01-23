@@ -12,7 +12,7 @@ import numpy as np
 import argparse
 
 from src.utils import set_seed
-from src.agents import DQNAgent, DoubleDQNAgent, DuelingDQNAgent, D3QNAgent
+from src.agents import DQNAgent, DoubleDQNAgent, DuelingDQNAgent, D3QNAgent, PPOAgent
 
 
 def parse_args():
@@ -36,6 +36,8 @@ def load_agent(algorithm: str, state_dim: int, action_dim: int, weights_path: st
         agent = DuelingDQNAgent(state_dim, action_dim)
     elif algorithm == 'd3qn':
         agent = D3QNAgent(state_dim, action_dim)
+    elif algorithm == 'ppo':
+        agent = PPOAgent(state_dim, action_dim)
     else:
         raise NotImplementedError(f"Algorithm '{algorithm}' not yet implemented")
     

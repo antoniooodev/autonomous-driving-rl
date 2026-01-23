@@ -12,7 +12,7 @@ import argparse
 from pathlib import Path
 
 from src.utils import set_seed, Logger
-from src.agents import DQNAgent, DoubleDQNAgent, DuelingDQNAgent, D3QNAgent
+from src.agents import DQNAgent, DoubleDQNAgent, DuelingDQNAgent, D3QNAgent, PPOAgent
 
 
 def parse_args():
@@ -65,6 +65,8 @@ def get_agent(algorithm: str, state_dim: int, action_dim: int):
         return DuelingDQNAgent(state_dim, action_dim)
     elif algorithm == 'd3qn':
         return D3QNAgent(state_dim, action_dim)
+    elif algorithm == 'ppo':
+        return PPOAgent(state_dim, action_dim)
     else:
         raise NotImplementedError(f"Algorithm '{algorithm}' not yet implemented")
 
@@ -120,11 +122,13 @@ def train(args):
         if done or truncated:
             print(f"Step {step:6d} | Episode {episode:3d} | Return: {episode_return:7.2f} | Steps: {episode_steps}")
             
-            logger.log({
+            log_data = {
                 "train/episode_return": episode_return,
                 "train/episode_length": episode_steps,
-                "train/epsilon": agent.epsilon
-            }, step)
+            }
+            if hasattr(agent, 'epsilon'):
+                log_data["train/epsilon"] = agent.epsilon
+            logger.log(log_data, step)
             
             state, _ = env.reset()
             state = state.reshape(-1)
