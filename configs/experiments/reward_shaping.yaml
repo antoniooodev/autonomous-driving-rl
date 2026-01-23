@@ -1,0 +1,26 @@
+# Reward shaping experiments
+experiments:
+  - name: "default"
+    shaping: "default"
+    description: "Original highway-env reward"
+
+  - name: "ttc_penalty"
+    shaping: "ttc"
+    ttc_threshold: 3.0
+    ttc_penalty: 0.1
+    description: "Penalize low time-to-collision"
+
+  - name: "smooth"
+    shaping: "smooth"
+    lane_change_penalty: 0.1
+    description: "Penalize frequent lane changes"
+
+  - name: "composite"
+    shaping: "composite"
+    ttc_penalty: 0.1
+    ttc_threshold: 3.0
+    lane_change_penalty: 0.05
+    speed_bonus_scale: 1.0
+    description: "Combined TTC + smoothness shaping"
+
+default: "default"

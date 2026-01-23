@@ -1,0 +1,22 @@
+# State representation experiments
+experiments:
+  - name: "kinematics"
+    representation: "kinematics"
+    flatten: true
+    state_dim: 25
+    network: "mlp"
+
+  - name: "occupancy_grid"
+    representation: "occupancy_grid"
+    flatten: true
+    state_dim: 1024 # 32x32
+    network: "mlp" # or "cnn" if implemented
+
+  - name: "grayscale"
+    representation: "grayscale"
+    flatten: true
+    state_dim: 16384 # 64x64x4
+    network: "cnn"
+
+# Default uses kinematics
+default: "kinematics"

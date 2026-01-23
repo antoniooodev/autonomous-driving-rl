@@ -1,0 +1,28 @@
+# Environment configuration variations
+experiments:
+  - name: "default"
+    lanes_count: 3
+    vehicles_count: 50
+    duration: 40
+
+  - name: "easy"
+    lanes_count: 4
+    vehicles_count: 20
+    duration: 40
+
+  - name: "medium"
+    lanes_count: 3
+    vehicles_count: 50
+    duration: 60
+
+  - name: "hard"
+    lanes_count: 2
+    vehicles_count: 80
+    duration: 40
+
+  - name: "dense"
+    lanes_count: 3
+    vehicles_count: 100
+    duration: 40
+
+default: "default"
