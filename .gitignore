@@ -8,6 +8,8 @@ venv/
 env/
 .env/
 .venv/
+!src/env/
+!src/env/**
 
 # IDE
 .idea/
