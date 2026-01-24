@@ -10,6 +10,7 @@ import gymnasium
 import highway_env
 import argparse
 from pathlib import Path
+from tqdm import tqdm
 
 from src.utils import set_seed, Logger
 from src.agents import DQNAgent, DoubleDQNAgent, DuelingDQNAgent, D3QNAgent, PPOAgent
@@ -104,7 +105,8 @@ def train(args):
     episode_return = 0
     episode_steps = 0
     
-    for step in range(1, args.max_steps + 1):
+    pbar = tqdm(range(1, args.max_steps + 1), desc="Training", unit="step")
+    for step in pbar:
         # Select and execute action
         action = agent.select_action(state)
         next_state, reward, done, truncated, _ = env.step(action)
@@ -120,7 +122,7 @@ def train(args):
         
         # Episode end
         if done or truncated:
-            print(f"Step {step:6d} | Episode {episode:3d} | Return: {episode_return:7.2f} | Steps: {episode_steps}")
+            pbar.set_postfix({"ep": episode, "ret": f"{episode_return:.1f}"})
             
             log_data = {
                 "train/episode_return": episode_return,
@@ -143,7 +145,7 @@ def train(args):
         # Evaluation
         if step % args.eval_freq == 0:
             eval_return = evaluate_agent(agent, "highway-fast-v0", env_config)
-            print(f"[EVAL] Step {step} | Avg Return: {eval_return:.2f}")
+            tqdm.write(f"[EVAL] Step {step} | Avg Return: {eval_return:.2f}")
             logger.log({"eval/return": eval_return}, step)
         
         # Save checkpoint
@@ -154,7 +156,7 @@ def train(args):
     # Save final model
     Path("weights").mkdir(parents=True, exist_ok=True)
     agent.save("weights/best_model.pth")
-    print(f"\nTraining complete. Model saved to weights/best_model.pth")
+    tqdm.write(f"\nTraining complete. Model saved to weights/best_model.pth")
     
     env.close()
     logger.close()

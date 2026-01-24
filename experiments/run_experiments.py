@@ -11,6 +11,7 @@ import gymnasium
 import highway_env
 import numpy as np
 from pathlib import Path
+from tqdm import tqdm
 import sys
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
@@ -91,7 +92,8 @@ def run_reward_shaping_experiment(args):
         episode_return = 0
         eval_returns = []
         
-        for step in range(1, args.max_steps + 1):
+        pbar = tqdm(range(1, args.max_steps + 1), desc=f"{shaping}", unit="step")
+        for step in pbar:
             action = agent.select_action(state)
             next_state, reward, done, truncated, _ = env.step(action)
             next_state = next_state.reshape(-1)
@@ -103,6 +105,7 @@ def run_reward_shaping_experiment(args):
             episode_return += reward
             
             if done or truncated:
+                pbar.set_postfix({"ep": episode, "ret": f"{episode_return:.1f}"})
                 state, _ = env.reset()
                 state = state.reshape(-1)
                 episode += 1
@@ -111,7 +114,7 @@ def run_reward_shaping_experiment(args):
             if step % args.eval_freq == 0:
                 eval_return = evaluate(agent, env)
                 eval_returns.append(eval_return)
-                print(f"[{shaping}] Step {step} | Eval Return: {eval_return:.2f}")
+                tqdm.write(f"[{shaping}] Step {step} | Eval Return: {eval_return:.2f}")
                 logger.log({"eval/return": eval_return}, step)
         
         env.close()
@@ -162,7 +165,8 @@ def run_env_variations_experiment(args):
         episode_return = 0
         eval_returns = []
         
-        for step in range(1, args.max_steps + 1):
+        pbar = tqdm(range(1, args.max_steps + 1), desc=f"{name}", unit="step")
+        for step in pbar:
             action = agent.select_action(state)
             next_state, reward, done, truncated, _ = env.step(action)
             next_state = next_state.reshape(-1)
@@ -174,6 +178,7 @@ def run_env_variations_experiment(args):
             episode_return += reward
             
             if done or truncated:
+                pbar.set_postfix({"ep": episode, "ret": f"{episode_return:.1f}"})
                 state, _ = env.reset()
                 state = state.reshape(-1)
                 episode += 1
@@ -182,7 +187,7 @@ def run_env_variations_experiment(args):
             if step % args.eval_freq == 0:
                 eval_return = evaluate(agent, env)
                 eval_returns.append(eval_return)
-                print(f"[{name}] Step {step} | Eval Return: {eval_return:.2f}")
+                tqdm.write(f"[{name}] Step {step} | Eval Return: {eval_return:.2f}")
                 logger.log({"eval/return": eval_return}, step)
         
         env.close()
