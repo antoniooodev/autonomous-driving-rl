@@ -17,13 +17,85 @@ from src.agents import DQNAgent, DoubleDQNAgent, DuelingDQNAgent, D3QNAgent, PPO
 
 def parse_args():
     parser = argparse.ArgumentParser()
-    parser.add_argument('--algorithm', type=str, default='dqn',
+    parser.add_argument('--algorithm', type=str, default='d3qn',
                         choices=['dqn', 'double_dqn', 'dueling_dqn', 'd3qn', 'ppo'])
     parser.add_argument('--weights', type=str, default='weights/best_model.pth')
     parser.add_argument('--episodes', type=int, default=10)
     parser.add_argument('--seed', type=int, default=0)
     parser.add_argument('--no_render', action='store_true')
+    parser.add_argument('--smooth', action='store_true', default=True,
+                        help='Enable action smoothing to prevent jittery lane changes')
+    parser.add_argument('--no_smooth', action='store_true',
+                        help='Disable action smoothing')
+    parser.add_argument('--smooth_window', type=int, default=3,
+                        help='Minimum steps between lane changes')
     return parser.parse_args()
+
+
+class ActionSmoother:
+    """Prevents jittery lane changes but allows emergency maneuvers."""
+    
+    LANE_LEFT = 0
+    IDLE = 1
+    LANE_RIGHT = 2
+    FASTER = 3
+    SLOWER = 4
+    
+    def __init__(self, cooldown: int = 3):
+        self.cooldown = cooldown
+        self.steps_since_lane_change = cooldown
+        self.last_lane_action = None
+        self.last_state = None
+    
+    def filter(self, action: int, state: np.ndarray = None) -> int:
+        """Filter action to prevent jittery behavior, but allow emergency maneuvers."""
+        is_lane_change = action in [self.LANE_LEFT, self.LANE_RIGHT]
+        
+        # Check for emergency situation (vehicle very close ahead)
+        emergency = False
+        if state is not None:
+            state_matrix = state.reshape(5, 5)
+            for i in range(1, 5):
+                presence, x, y, vx, vy = state_matrix[i]
+                if presence > 0.5:
+                    # Vehicle in same lane, very close ahead
+                    if abs(y) < 0.1 and 0 < x < 0.08:
+                        emergency = True
+                        break
+                    # Vehicle approaching fast from behind in same lane
+                    if abs(y) < 0.1 and -0.05 < x < 0 and vx > 0.1:
+                        emergency = True
+                        break
+        
+        if is_lane_change:
+            # Always allow emergency lane changes
+            if emergency:
+                self.steps_since_lane_change = 0
+                self.last_lane_action = action
+                return action
+            
+            # Block lane change if cooldown not expired
+            if self.steps_since_lane_change < self.cooldown:
+                return self.IDLE
+            
+            # Block opposite lane change immediately after (prevents zigzag)
+            if self.last_lane_action is not None:
+                if (action == self.LANE_LEFT and self.last_lane_action == self.LANE_RIGHT) or \
+                   (action == self.LANE_RIGHT and self.last_lane_action == self.LANE_LEFT):
+                    if self.steps_since_lane_change < self.cooldown * 2:
+                        return self.IDLE
+            
+            # Allow lane change
+            self.steps_since_lane_change = 0
+            self.last_lane_action = action
+            return action
+        else:
+            self.steps_since_lane_change += 1
+            return action
+    
+    def reset(self):
+        self.steps_since_lane_change = self.cooldown
+        self.last_lane_action = None
 
 
 def load_agent(algorithm: str, state_dim: int, action_dim: int, weights_path: str):
@@ -66,7 +138,10 @@ def evaluate(args):
     agent = load_agent(args.algorithm, state_dim, action_dim, args.weights)
     
     print(f"Evaluating for {args.episodes} episodes...")
-    print("-" * 50)
+    use_smooth = args.smooth and not args.no_smooth
+    
+    # Action smoother
+    smoother = ActionSmoother(cooldown=args.smooth_window) if use_smooth else None
     
     # Metrics
     returns = []
@@ -78,11 +153,19 @@ def evaluate(args):
         state = state.reshape(-1)
         done, truncated = False, False
         
+        if smoother:
+            smoother.reset()
+        
         episode_return = 0
         episode_steps = 0
         
         while not (done or truncated):
             action = agent.select_action(state, evaluate=True)
+            
+            # Apply smoothing if enabled (pass state for emergency detection)
+            if smoother:
+                action = smoother.filter(action, state)
+            
             state, reward, done, truncated, _ = env.step(action)
             state = state.reshape(-1)
             
