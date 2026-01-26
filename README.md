@@ -88,7 +88,7 @@ tensorboard>=2.13.0
 
 ---
 
-## ⚡ Quick Start
+## Quick Start
 
 ### Evaluate Pre-trained Agent
 
@@ -161,7 +161,7 @@ python evaluate.py --no_smooth
 
 ---
 
-## 📁 Project Structure
+## Project Structure
 
 ```
 autonomous-driving-rl/
@@ -245,7 +245,7 @@ I experimented with different reward modifications:
 
 ---
 
-## 🔧 Configuration
+## Configuration
 
 ### Training Arguments
 
@@ -277,7 +277,7 @@ Options:
 
 ---
 
-## 📝 Course Project
+## Course Project
 
 This project was developed for the **Reinforcement Learning** course (2025/2026) at the University of Padova.
 
