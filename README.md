@@ -1,4 +1,4 @@
-# 🚗 Autonomous Highway Driving with Deep Reinforcement Learning
+# Autonomous Highway Driving with Deep Reinforcement Learning
 
 <p align="center">
   <img src="results/plots/highway_demo.gif" alt="Highway Driving Demo" width="600"/>
@@ -30,7 +30,7 @@ This project implements and compares multiple Deep Reinforcement Learning algori
 
 ---
 
-## 🎯 Results
+## Results
 
 All RL agents significantly outperform the heuristic baseline:
 
@@ -45,12 +45,12 @@ All RL agents significantly outperform the heuristic baseline:
 | _Random_        | _7.92_      | _5.71_ | _99%_      |
 
 <p align="center">
-  <img src="results/plots/learning_curves.png" alt="Learning Curves" width="700"/>
+  <img src="https://i.ibb.co/tphJ2KCT/learning-curves.png" alt="Learning Curves" width="700"/>
 </p>
 
 ---
 
-## 🚀 Installation
+## Installation
 
 ### Prerequisites
 
@@ -129,7 +129,7 @@ python scripts/evaluate_baselines.py
 
 ---
 
-## 🧠 Algorithms
+## Algorithms
 
 ### Value-Based Methods
 
@@ -215,7 +215,7 @@ autonomous-driving-rl/
 
 ---
 
-## 📊 Experiments
+## Experiments
 
 ### Reward Shaping
 
@@ -229,7 +229,7 @@ I experimented with different reward modifications:
 | Composite | TTC + Smooth combined             | Similar to default  |
 
 <p align="center">
-  <img src="results/plots/reward_shaping_comparison.png" alt="Reward Shaping" width="700"/>
+  <img src="https://i.ibb.co/VW1sf8FX/reward-shaping-comparison.png" alt="Reward Shaping" width="700"/>
 </p>
 
 **Finding**: Naive reward shaping can hurt performance. The default reward function is already well-tuned for this environment.
@@ -286,7 +286,7 @@ This project was developed for the **Reinforcement Learning** course (2025/2026)
 
 ---
 
-## 🙏 Acknowledgments
+## Acknowledgments
 
 - [Farama Foundation](https://farama.org/) for the highway-env environment
 - [Stable Baselines3](https://stable-baselines3.readthedocs.io/) for algorithm references
