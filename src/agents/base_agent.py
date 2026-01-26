@@ -18,9 +18,14 @@ class BaseAgent(ABC):
         self.state_dim = state_dim
         self.action_dim = action_dim
         
-        # Set device
+        # Set device (with MPS support for Apple Silicon)
         if device == "auto":
-            self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+            if torch.backends.mps.is_available():
+                self.device = torch.device("mps")
+            elif torch.cuda.is_available():
+                self.device = torch.device("cuda")
+            else:
+                self.device = torch.device("cpu")
         else:
             self.device = torch.device(device)
     

@@ -10,6 +10,7 @@ import gymnasium
 import highway_env
 import numpy as np
 import argparse
+from tqdm import tqdm
 
 from src.utils import set_seed
 from src.agents import DQNAgent, DoubleDQNAgent, DuelingDQNAgent, D3QNAgent, PPOAgent
@@ -139,6 +140,9 @@ def evaluate(args):
     
     print(f"Evaluating for {args.episodes} episodes...")
     use_smooth = args.smooth and not args.no_smooth
+    if use_smooth:
+        print(f"Action smoothing ENABLED (cooldown={args.smooth_window} steps)")
+    print("-" * 50)
     
     # Action smoother
     smoother = ActionSmoother(cooldown=args.smooth_window) if use_smooth else None
@@ -148,7 +152,11 @@ def evaluate(args):
     lengths = []
     crashes = []
     
-    for episode in range(1, args.episodes + 1):
+    # Use tqdm for progress bar (disable per-episode print if no_render)
+    show_episodes = render_mode is not None
+    episode_iter = tqdm(range(1, args.episodes + 1), desc="Evaluating", disable=False)
+    
+    for episode in episode_iter:
         state, _ = env.reset()
         state = state.reshape(-1)
         done, truncated = False, False
@@ -179,7 +187,12 @@ def evaluate(args):
         lengths.append(episode_steps)
         crashes.append(done)
         
-        print(f"Episode {episode:3d} | Steps: {episode_steps:4d} | Return: {episode_return:8.2f} | Crash: {done}")
+        # Update progress bar with current stats
+        episode_iter.set_postfix({
+            'return': f'{episode_return:.1f}',
+            'crash': done,
+            'avg': f'{np.mean(returns):.1f}'
+        })
     
     # Summary
     print("-" * 50)

@@ -1,0 +1,20 @@
+Loading agent from weights/final/d3qn_step50000.pth
+Evaluating for 100 episodes...
+Episode   1 | Steps:   40 | Return:    27.03 | Crash: False
+Episode   2 | Steps:   40 | Return:    26.76 | Crash: False
+Episode   3 | Steps:   40 | Return:    27.56 | Crash: False
+Episode   4 | Steps:   40 | Return:    26.83 | Crash: False
+Episode   5 | Steps:   40 | Return:    29.36 | Crash: False
+Episode   6 | Steps:   40 | Return:    27.03 | Crash: False
+Episode   7 | Steps:   40 | Return:    27.53 | Crash: False
+Episode   8 | Steps:   40 | Return:    26.69 | Crash: False
+Episode   9 | Steps:   40 | Return:    26.86 | Crash: False
+Episode  10 | Steps:   40 | Return:    28.29 | Crash: False
+Episode  11 | Steps:   40 | Return:    28.09 | Crash: False
+Episode  12 | Steps:   40 | Return:    27.59 | Crash: False
+Episode  13 | Steps:   40 | Return:    29.09 | Crash: False
+Episode  14 | Steps:   40 | Return:    26.79 | Crash: False
+Episode  15 | Steps:   40 | Return:    29.09 | Crash: False
+Episode  16 | Steps:   40 | Return:    28.06 | Crash: False
+Episode  17 | Steps:   40 | Return:    26.93 | Crash: False
+Episode  18 | Steps:   40 | Return:    27.99 | Crash: False

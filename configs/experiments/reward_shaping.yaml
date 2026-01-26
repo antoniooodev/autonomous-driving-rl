@@ -12,15 +12,19 @@ experiments:
 
   - name: "smooth"
     shaping: "smooth"
-    lane_change_penalty: 0.1
-    description: "Penalize frequent lane changes"
+    unnecessary_lane_change_penalty: 0.15
+    right_lane_bonus: 0.08
+    zigzag_penalty: 0.25
+    description: "Intelligent lane change: penalize unnecessary changes, reward right lane"
 
   - name: "composite"
     shaping: "composite"
     ttc_penalty: 0.1
     ttc_threshold: 3.0
-    lane_change_penalty: 0.05
+    unnecessary_lc_penalty: 0.15
+    right_lane_bonus: 0.08
+    zigzag_penalty: 0.25
     speed_bonus_scale: 1.0
-    description: "Combined TTC + smoothness shaping"
+    description: "Combined TTC + intelligent lane change + right lane preference"
 
 default: "default"

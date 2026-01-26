@@ -4,16 +4,28 @@ Training script for autonomous driving RL agents.
 Usage:
     python training.py
     python training.py --algorithm dqn --max_steps 100000
+    python training.py --algorithm d3qn --reward_shaping smooth --max_steps 50000
 """
 
 import gymnasium
 import highway_env
 import argparse
+import torch
 from pathlib import Path
 from tqdm import tqdm
 
 from src.utils import set_seed, Logger
 from src.agents import DQNAgent, DoubleDQNAgent, DuelingDQNAgent, D3QNAgent, PPOAgent
+from src.env import SmoothnessRewardWrapper, CompositeRewardWrapper
+
+
+def get_device():
+    """Get best available device (MPS for Apple Silicon, CUDA, or CPU)."""
+    if torch.backends.mps.is_available():
+        return "mps"
+    elif torch.cuda.is_available():
+        return "cuda"
+    return "cpu"
 
 
 def parse_args():
@@ -25,12 +37,29 @@ def parse_args():
     parser.add_argument('--eval_freq', type=int, default=5000)
     parser.add_argument('--save_freq', type=int, default=10000)
     parser.add_argument('--log_freq', type=int, default=100)
+    parser.add_argument('--reward_shaping', type=str, default='none',
+                        choices=['none', 'smooth', 'composite'],
+                        help='Apply intelligent reward shaping')
+    parser.add_argument('--device', type=str, default='auto',
+                        help='Device: auto, cpu, mps, cuda')
     return parser.parse_args()
 
 
-def create_env(env_name: str, config: dict):
-    """Create highway environment."""
-    return gymnasium.make(env_name, config=config)
+def create_env(env_name: str, config: dict, reward_shaping: str = 'none'):
+    """Create highway environment with optional reward shaping."""
+    env = gymnasium.make(env_name, config=config)
+    
+    # Apply reward shaping wrapper
+    if reward_shaping == 'smooth':
+        env = SmoothnessRewardWrapper(env)
+        print("Reward shaping: SmoothnessRewardWrapper (intelligent lane change penalty)")
+    elif reward_shaping == 'composite':
+        env = CompositeRewardWrapper(env)
+        print("Reward shaping: CompositeRewardWrapper (TTC + intelligent lane change)")
+    elif reward_shaping != 'none':
+        print(f"Warning: Unknown reward shaping '{reward_shaping}', using default")
+    
+    return env
 
 
 def evaluate_agent(agent, env_name: str, config: dict, n_episodes: int = 5):
@@ -56,18 +85,18 @@ def evaluate_agent(agent, env_name: str, config: dict, n_episodes: int = 5):
     return sum(returns) / len(returns)
 
 
-def get_agent(algorithm: str, state_dim: int, action_dim: int):
+def get_agent(algorithm: str, state_dim: int, action_dim: int, device: str = "auto"):
     """Create agent based on algorithm name."""
     if algorithm == 'dqn':
-        return DQNAgent(state_dim, action_dim)
+        return DQNAgent(state_dim, action_dim, device=device)
     elif algorithm == 'double_dqn':
-        return DoubleDQNAgent(state_dim, action_dim)
+        return DoubleDQNAgent(state_dim, action_dim, device=device)
     elif algorithm == 'dueling_dqn':
-        return DuelingDQNAgent(state_dim, action_dim)
+        return DuelingDQNAgent(state_dim, action_dim, device=device)
     elif algorithm == 'd3qn':
-        return D3QNAgent(state_dim, action_dim)
+        return D3QNAgent(state_dim, action_dim, device=device)
     elif algorithm == 'ppo':
-        return PPOAgent(state_dim, action_dim)
+        return PPOAgent(state_dim, action_dim, device=device)
     else:
         raise NotImplementedError(f"Algorithm '{algorithm}' not yet implemented")
 
@@ -75,6 +104,17 @@ def get_agent(algorithm: str, state_dim: int, action_dim: int):
 def train(args):
     """Main training loop."""
     set_seed(args.seed)
+    
+    # Device selection (MPS for Apple Silicon)
+    if torch.backends.mps.is_available():
+        device = "mps"
+        print("Using MPS (Apple Silicon GPU)")
+    elif torch.cuda.is_available():
+        device = "cuda"
+        print("Using CUDA GPU")
+    else:
+        device = "cpu"
+        print("Using CPU")
     
     # Environment config
     env_config = {
@@ -84,17 +124,18 @@ def train(args):
         'duration': 40,
     }
     
-    # Create training env
-    env = create_env("highway-fast-v0", env_config)
+    # Create training env with reward shaping
+    env = create_env("highway-fast-v0", env_config, args.reward_shaping)
     state_dim = env.observation_space.shape[0] * env.observation_space.shape[1]
     action_dim = env.action_space.n
     
     print(f"State dim: {state_dim}, Action dim: {action_dim}")
     print(f"Algorithm: {args.algorithm}, Max steps: {args.max_steps}")
+    print(f"Device: {device}")
     print("-" * 50)
     
     # Create agent and logger
-    agent = get_agent(args.algorithm, state_dim, action_dim)
+    agent = get_agent(args.algorithm, state_dim, action_dim, device)
     logger = Logger("results/logs", experiment_name=args.algorithm)
     
     # Training
