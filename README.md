@@ -26,7 +26,7 @@ This project implements and compares multiple Deep Reinforcement Learning algori
 - ✅ **Baseline Comparison**: TTC Heuristic, Random Policy, Manual Control
 - ✅ **Reward Shaping Experiments**: TTC penalty, Smoothness reward, Composite
 - ✅ **Action Smoothing**: Post-processing filter for realistic driving behavior
-- ✅ **Apple Silicon Support**: MPS acceleration for M1/M2 Macs
+- ✅ **Apple Silicon Support**: MPS acceleration for Macs
 
 ---
 
