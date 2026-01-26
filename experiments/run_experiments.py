@@ -151,7 +151,7 @@ def run_env_variations_experiment(args):
             'duration': 40,
             **config
         }
-        env = gymnasium.make("highway-fast-v0", config=env_config)
+        env = gymnasium.make("highway-v0", config=env_config)
         
         state_dim = np.prod(env.observation_space.shape)
         action_dim = env.action_space.n

@@ -5,10 +5,10 @@
 # Environment Settings
 # =============================================================================
 env:
-  # Environment name (highway-fast-v0 for training, highway-v0 for evaluation)
-  train_env: "highway-fast-v0"
+  # Environment name (highway-v0 for training and evaluation)
+  train_env: "highway-v0"
   eval_env: "highway-v0"
-  
+
   # Environment configuration
   config:
     action:
@@ -32,10 +32,10 @@ env:
 # =============================================================================
 training:
   max_steps: 100000
-  eval_frequency: 5000  # Evaluate every N steps
+  eval_frequency: 5000 # Evaluate every N steps
   eval_episodes: 10
-  save_frequency: 10000  # Save checkpoint every N steps
-  log_frequency: 100  # Log metrics every N steps
+  save_frequency: 10000 # Save checkpoint every N steps
+  log_frequency: 100 # Log metrics every N steps
 
 # =============================================================================
 # Algorithm Hyperparameters (defaults for DQN family)
@@ -44,32 +44,32 @@ algorithm:
   # Network architecture
   hidden_dims: [256, 256]
   activation: "relu"
-  
+
   # Learning parameters
   learning_rate: 0.0005
-  gamma: 0.99  # Discount factor
-  
+  gamma: 0.99 # Discount factor
+
   # Exploration
   epsilon_start: 1.0
   epsilon_end: 0.05
   epsilon_decay_steps: 50000
-  
+
   # Experience replay
   buffer_size: 100000
   batch_size: 64
-  learning_starts: 1000  # Steps before training starts
-  
+  learning_starts: 1000 # Steps before training starts
+
   # Target network
-  target_update_frequency: 100  # Steps between target network updates
-  tau: 1.0  # Hard update (1.0) or soft update (< 1.0)
+  target_update_frequency: 100 # Steps between target network updates
+  tau: 1.0 # Hard update (1.0) or soft update (< 1.0)
 
 # =============================================================================
 # PER (Prioritized Experience Replay) Settings
 # =============================================================================
 per:
-  alpha: 0.6  # Priority exponent
-  beta_start: 0.4  # Importance sampling start
-  beta_end: 1.0  # Importance sampling end
+  alpha: 0.6 # Priority exponent
+  beta_start: 0.4 # Importance sampling start
+  beta_end: 1.0 # Importance sampling end
   beta_decay_steps: 100000
 
 # =============================================================================
@@ -78,23 +78,23 @@ per:
 ppo:
   # Network
   hidden_dims: [256, 256]
-  
+
   # Learning
   learning_rate: 0.0003
   gamma: 0.99
   gae_lambda: 0.95
-  
+
   # PPO specific
   clip_epsilon: 0.2
   value_coef: 0.5
   entropy_coef: 0.01
   max_grad_norm: 0.5
-  
+
   # Training
-  n_steps: 2048  # Steps per rollout
-  n_epochs: 10  # Epochs per update
+  n_steps: 2048 # Steps per rollout
+  n_epochs: 10 # Epochs per update
   batch_size: 64
-  
+
 # =============================================================================
 # Logging and Saving
 # =============================================================================
@@ -103,7 +103,7 @@ logging:
   csv: true
   console: true
   log_dir: "results/logs"
-  
+
 saving:
   checkpoint_dir: "results/checkpoints"
   weights_dir: "weights"
@@ -116,4 +116,4 @@ seed: 0
 # =============================================================================
 # Device
 # =============================================================================
-device: "auto"  # auto, cpu, or cuda
+device: "auto" # auto, cpu, or cuda

@@ -111,7 +111,7 @@ def evaluate_policy(policy, env, n_episodes, desc="Evaluating"):
     crashes = []
     
     for _ in tqdm(range(n_episodes), desc=desc):
-        state, _ = env.reset()
+        state, _ = env.reset(seed=args.seed + episode - 1)
         state = state.reshape(-1)
         episode_return = 0
         episode_length = 0
@@ -119,14 +119,17 @@ def evaluate_policy(policy, env, n_episodes, desc="Evaluating"):
         
         while not (done or truncated):
             action = policy.select_action(state)
-            state, reward, done, truncated, _ = env.step(action)
+            state, reward, done, truncated, info = env.step(action)
             state = state.reshape(-1)
             episode_return += reward
             episode_length += 1
         
+        crashed = info.get("crashed", done and not truncated)
+        
         returns.append(episode_return)
         lengths.append(episode_length)
-        crashes.append(done)
+        crashes.append(crashed)
+
     
     return {
         'mean_return': np.mean(returns),

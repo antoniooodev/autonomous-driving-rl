@@ -157,7 +157,7 @@ def evaluate(args):
     episode_iter = tqdm(range(1, args.episodes + 1), desc="Evaluating", disable=False)
     
     for episode in episode_iter:
-        state, _ = env.reset()
+        state, _ = env.reset(seed=args.seed + episode - 1)
         state = state.reshape(-1)
         done, truncated = False, False
         
@@ -174,7 +174,7 @@ def evaluate(args):
             if smoother:
                 action = smoother.filter(action, state)
             
-            state, reward, done, truncated, _ = env.step(action)
+            state, reward, done, truncated, info = env.step(action)
             state = state.reshape(-1)
             
             if render_mode:
@@ -182,10 +182,12 @@ def evaluate(args):
             
             episode_return += reward
             episode_steps += 1
+            
+            crashed = info.get("crashed", done and not truncated)
         
         returns.append(episode_return)
         lengths.append(episode_steps)
-        crashes.append(done)
+        crashes.append(crashed)
         
         # Update progress bar with current stats
         episode_iter.set_postfix({

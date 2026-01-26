@@ -125,7 +125,7 @@ def train(args):
     }
     
     # Create training env with reward shaping
-    env = create_env("highway-fast-v0", env_config, args.reward_shaping)
+    env = create_env("highway-v0", env_config, args.reward_shaping)
     state_dim = env.observation_space.shape[0] * env.observation_space.shape[1]
     action_dim = env.action_space.n
     
@@ -185,7 +185,7 @@ def train(args):
         
         # Evaluation
         if step % args.eval_freq == 0:
-            eval_return = evaluate_agent(agent, "highway-fast-v0", env_config)
+            eval_return = evaluate_agent(agent, "highway-v0", env_config)
             tqdm.write(f"[EVAL] Step {step} | Avg Return: {eval_return:.2f}")
             logger.log({"eval/return": eval_return}, step)
         
