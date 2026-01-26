@@ -1,7 +1,7 @@
 # Autonomous Highway Driving with Deep Reinforcement Learning
 
 <p align="center">
-  <img src="results/plots/highway_demo.gif" alt="Highway Driving Demo" width="600"/>
+  <img src="https://raw.githubusercontent.com/eleurent/highway-env/gh-media/docs/media/highway-env.gif?raw=true" alt="Highway Driving Demo" width="600"/>
 </p>
 
 <p align="center">
