@@ -24,8 +24,6 @@ results/plots/*.png
 results/tables/*.csv
 
 # Weights (keep directory, ignore large files)
-weights/*.pth
-weights/*.pt
 !weights/.gitkeep
 
 # Jupyter

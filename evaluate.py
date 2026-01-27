@@ -140,9 +140,6 @@ def evaluate(args):
     
     print(f"Evaluating for {args.episodes} episodes...")
     use_smooth = args.smooth and not args.no_smooth
-    if use_smooth:
-        print(f"Action smoothing ENABLED (cooldown={args.smooth_window} steps)")
-    print("-" * 50)
     
     # Action smoother
     smoother = ActionSmoother(cooldown=args.smooth_window) if use_smooth else None

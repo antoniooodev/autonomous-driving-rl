@@ -110,8 +110,8 @@ def evaluate_policy(policy, env, n_episodes, desc="Evaluating"):
     lengths = []
     crashes = []
     
-    for _ in tqdm(range(n_episodes), desc=desc):
-        state, _ = env.reset(seed=args.seed + episode - 1)
+    for episode in tqdm(range(n_episodes), desc=desc):
+        state, _ = env.reset(seed=episode)
         state = state.reshape(-1)
         episode_return = 0
         episode_length = 0
