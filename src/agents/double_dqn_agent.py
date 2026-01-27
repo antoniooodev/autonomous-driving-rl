@@ -12,6 +12,10 @@ class DoubleDQNAgent(DQNAgent):
     Double DQN: uses online network to select actions,
     target network to evaluate them.
     """
+
+    def select_action_batch(self, states: np.ndarray, evaluate: bool = False) -> np.ndarray:
+        """Select actions for a batch of states using epsilon-greedy policy."""
+        return super().select_action_batch(states, evaluate=evaluate)
     
     def train_step(self):
         """Training step with Double DQN target computation."""
@@ -26,13 +30,11 @@ class DoubleDQNAgent(DQNAgent):
         next_states = torch.FloatTensor(next_states).to(self.device)
         dones = torch.FloatTensor(dones).to(self.device)
         
-        # Current Q values
         q_values = self.q_network(states).gather(1, actions.unsqueeze(1)).squeeze(1)
         
-        # Double DQN: select action with online network, evaluate with target
         with torch.no_grad():
-            next_actions = self.q_network(next_states).argmax(dim=1, keepdim=True)
-            next_q_values = self.target_network(next_states).gather(1, next_actions).squeeze(1)
+            next_actions = self.q_network(next_states).argmax(1)
+            next_q_values = self.target_network(next_states).gather(1, next_actions.unsqueeze(1)).squeeze(1)
             target_q_values = rewards + self.gamma * next_q_values * (1 - dones)
         
         loss = nn.MSELoss()(q_values, target_q_values)
@@ -45,6 +47,7 @@ class DoubleDQNAgent(DQNAgent):
         if self.train_steps % self.target_update_freq == 0:
             self.target_network.load_state_dict(self.q_network.state_dict())
         
-        self.epsilon = max(self.epsilon_end, self.epsilon - self.epsilon_decay)
+        if self.epsilon > self.epsilon_end:
+            self.epsilon -= self.epsilon_decay
         
-        return {"loss": loss.item(), "epsilon": self.epsilon, "q_mean": q_values.mean().item()}
+        return {"loss": loss.item(), "epsilon": self.epsilon}

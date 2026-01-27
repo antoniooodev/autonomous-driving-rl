@@ -37,3 +37,6 @@ Thumbs.db
 # Misc
 *.log
 *.tmp
+src/env/__pycache__/__init__.cpython-311.pyc
+src/env/__pycache__/reward_shaping.cpython-311.pyc
+src/env/__pycache__/state_representations.cpython-311.pyc
