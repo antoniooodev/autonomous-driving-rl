@@ -174,6 +174,7 @@ autonomous-driving-rl/
 ├── training.py              # Main training script
 ├── evaluate.py              # Evaluation script
 ├── requirements.txt         # Dependencies
+├── baseline.py
 │
 ├── src/
 │   ├── agents/              # RL agent implementations
@@ -213,10 +214,10 @@ autonomous-driving-rl/
 │   ├── plots/               # Generated figures
 │   └── tables/              # CSV results
 │
-├── report/                  # LaTeX report
-│   ├── main.tex
-│   ├── references.bib
-│   └── figures/
+├── report/                  # Pdf report
+│   └── antonio_tangaro_autonomus_driving.pdf
+│
+│
 │
 └── scripts/                 # Utility scripts
     ├── evaluate_baselines.py
