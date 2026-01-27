@@ -23,26 +23,29 @@ This project implements and compares multiple Deep Reinforcement Learning algori
 ### Key Features
 
 - ✅ **5 RL Algorithms**: DQN, Double DQN, Dueling DQN, D3QN, PPO
-- ✅ **Baseline Comparison**: TTC Heuristic, Random Policy, Manual Control
+- ✅ **Baseline Comparison**: TTC Heuristic, Random Policy
 - ✅ **Reward Shaping Experiments**: TTC penalty, Smoothness reward, Composite
 - ✅ **Action Smoothing**: Post-processing filter for realistic driving behavior
-- ✅ **Apple Silicon Support**: MPS acceleration for Macs
+- ✅ **CUDA Vectorized Training**: 3x speedup on NVIDIA GPUs
+- ✅ **Apple Silicon Support**: MPS acceleration for Macs (single-env fallback)
 
 ---
 
 ## Results
 
-All RL agents significantly outperform the heuristic baseline:
+All RL agents significantly outperform the heuristic baseline (+15 points, crash rate 89% → 0-2%):
 
 | Algorithm       | Mean Return | Std    | Crash Rate |
 | --------------- | ----------- | ------ | ---------- |
-| **Dueling DQN** | **28.00**   | 0.94   | **0%**     |
-| D3QN            | 27.96       | 0.92   | 0%         |
-| Double DQN      | 27.89       | 1.59   | 1%         |
-| DQN             | 27.64       | 0.85   | 0%         |
-| PPO             | 27.46       | 3.68   | 4%         |
-| _TTC Heuristic_ | _14.76_     | _9.28_ | _85%_      |
-| _Random_        | _7.92_      | _5.71_ | _99%_      |
+| **Dueling DQN** | **28.30**   | 0.96   | **0%**     |
+| D3QN            | 28.24       | 0.95   | 0%         |
+| DQN             | 28.20       | 0.85   | 0%         |
+| Double DQN      | 28.19       | 0.87   | 0%         |
+| PPO             | 28.07       | 1.65   | 2%         |
+| _TTC Heuristic_ | _13.28_     | _8.87_ | _89%_      |
+| _Random_        | _8.57_      | _6.66_ | _96%_      |
+
+_Evaluation: 100 episodes, seed e-1 for episode e, ActionSmoother enabled_
 
 <p align="center">
   <img src="https://i.ibb.co/tphJ2KCT/learning-curves.png" alt="Learning Curves" width="700"/>
@@ -61,7 +64,7 @@ All RL agents significantly outperform the heuristic baseline:
 
 ```bash
 # Clone the repository
-git clone https://github.com/yourusername/autonomous-driving-rl.git
+git clone https://github.com/antoniooodev/autonomous-driving-rl.git
 cd autonomous-driving-rl
 
 # Create virtual environment
@@ -99,7 +102,7 @@ python evaluate.py
 # Evaluate specific algorithm
 python evaluate.py --algorithm d3qn --weights weights/final/d3qn_step50000.pth --episodes 10
 
-# Evaluate without rendering (faster)
+# Evaluate without rendering (faster, 100 episodes)
 python evaluate.py --no_render --episodes 100
 ```
 
@@ -108,6 +111,9 @@ python evaluate.py --no_render --episodes 100
 ```bash
 # Train DQN (default)
 python training.py --algorithm dqn --max_steps 50000
+
+# Train with CUDA vectorized environments (NVIDIA GPU, ~3x faster)
+python training.py --algorithm dqn --max_steps 50000 --num_envs 8
 
 # Train with reward shaping
 python training.py --algorithm d3qn --reward_shaping smooth --max_steps 50000
@@ -123,7 +129,7 @@ python training.py --algorithm ppo --max_steps 50000
 ### Run Baseline
 
 ```bash
-# TTC Heuristic baseline
+# TTC Heuristic and Random baseline
 python scripts/evaluate_baselines.py
 ```
 
@@ -148,10 +154,10 @@ python scripts/evaluate_baselines.py
 
 ### Action Smoothing
 
-To prevent jittery lane-change behavior, I implement an `ActionSmoother` that:
+To prevent jittery lane-change behavior, an `ActionSmoother` is implemented that:
 
-- Enforces minimum steps between lane changes
-- Allows emergency maneuvers when collision is imminent
+- Enforces minimum steps (default: 3) between lane changes
+- Allows emergency maneuvers when collision is imminent (x < 0.1 normalized)
 - Prevents zigzag patterns (LEFT→RIGHT→LEFT)
 
 ```bash
@@ -188,29 +194,34 @@ autonomous-driving-rl/
 │   │   └── rollout_buffer.py
 │   │
 │   ├── env/                 # Environment wrappers
-│   │   ├── reward_shaping.py
-│   │   └── state_representations.py
+│   │   └── reward_shaping.py
 │   │
 │   └── utils/               # Utilities
 │       └── logger.py
 │
 ├── configs/                 # Configuration files
+│   ├── default.yaml
 │   ├── algorithms/
 │   └── experiments/
 │
 ├── weights/                 # Trained models
-│   ├── best_model.pth       # Best model for evaluate.py
+│   ├── best_model.pth       # Best model (Dueling DQN)
 │   └── final/               # All final models
 │
 ├── results/
-│   ├── logs/                # Training logs
+│   ├── logs/                # Training logs (TensorBoard)
 │   ├── plots/               # Generated figures
 │   └── tables/              # CSV results
+│
+├── report/                  # LaTeX report
+│   ├── main.tex
+│   ├── references.bib
+│   └── figures/
 │
 └── scripts/                 # Utility scripts
     ├── evaluate_baselines.py
     ├── plot_results.py
-    └── train_all.py
+    └── final_evaluation.py
 ```
 
 ---
@@ -219,7 +230,7 @@ autonomous-driving-rl/
 
 ### Reward Shaping
 
-I experimented with different reward modifications:
+Different reward modifications were tested:
 
 | Shaping   | Description                       | Result              |
 | --------- | --------------------------------- | ------------------- |
@@ -232,7 +243,7 @@ I experimented with different reward modifications:
   <img src="https://i.ibb.co/VW1sf8FX/reward-shaping-comparison.png" alt="Reward Shaping" width="700"/>
 </p>
 
-**Finding**: Naive reward shaping can hurt performance. The default reward function is already well-tuned for this environment.
+**Finding**: Naive reward shaping can hurt performance. The default reward function is already well-tuned. Post-processing (ActionSmoother) is more effective than reward modification.
 
 ### Environment Variations
 
@@ -259,6 +270,8 @@ Options:
   --eval_freq       Evaluation frequency (default: 5000)
   --save_freq       Checkpoint save frequency (default: 10000)
   --reward_shaping  Reward shaping type (none, smooth, composite)
+  --num_envs        Number of parallel environments for CUDA (default: 1)
+  --vector_backend  Vectorization backend: async or sync (default: async)
 ```
 
 ### Evaluation Arguments
@@ -267,9 +280,10 @@ Options:
 python evaluate.py --help
 
 Options:
-  --algorithm       Algorithm to evaluate
-  --weights         Path to model weights
+  --algorithm       Algorithm to evaluate (default: dueling_dqn)
+  --weights         Path to model weights (default: weights/best_model.pth)
   --episodes        Number of evaluation episodes (default: 10)
+  --seed            Random seed (default: 0)
   --no_render       Disable rendering
   --no_smooth       Disable action smoothing
   --smooth_window   Minimum steps between lane changes (default: 3)
@@ -277,17 +291,34 @@ Options:
 
 ---
 
+## Reproducibility
+
+All experiments use **seed=0** for reproducibility. Evaluation episodes use deterministic seeding: episode _e_ uses seed _e-1_, ensuring identical traffic configurations across runs.
+
+```bash
+# Reproduce final results
+python scripts/evaluate_baselines.py
+python evaluate.py --algorithm dueling_dqn --episodes 100 --no_render
+```
+
+---
+
+## Training Performance
+
+| Device                          | Training Time (50k steps) |
+| ------------------------------- | ------------------------- |
+| NVIDIA GPU (CUDA, vectorized)   | ~30 min                   |
+| Apple Silicon (MPS, single-env) | ~1h 30min                 |
+| CPU                             | ~3h+                      |
+
+Use `--num_envs 8` on CUDA for maximum speedup.
+
+---
+
 ## Course Project
 
 This project was developed for the **Reinforcement Learning** course (2025/2026) at the University of Padova.
 
-**Professor**: Gian Antonio Susto  
-**Teaching Assistants**: Alberto Sinigaglia, Riccardo De Monte
+**Professor**: Gian Antonio Susto
 
----
-
-## Acknowledgments
-
-- [Farama Foundation](https://farama.org/) for the highway-env environment
-- [Stable Baselines3](https://stable-baselines3.readthedocs.io/) for algorithm references
-- Course instructors for guidance and support
+**Student**: Antonio Tangaro (ID: 2163822)
