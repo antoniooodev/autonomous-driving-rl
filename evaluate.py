@@ -17,6 +17,9 @@ from src.agents import DQNAgent, DoubleDQNAgent, DuelingDQNAgent, D3QNAgent, PPO
 
 
 def parse_args():
+    """
+    parse_args.
+    """
     parser = argparse.ArgumentParser()
     parser.add_argument('--algorithm', type=str, default='d3qn',
                         choices=['dqn', 'double_dqn', 'dueling_dqn', 'd3qn', 'ppo'])
@@ -43,6 +46,12 @@ class ActionSmoother:
     SLOWER = 4
     
     def __init__(self, cooldown: int = 3):
+        """
+        __init__.
+        
+        Args:
+            cooldown (int): Parameter.
+        """
         self.cooldown = cooldown
         self.steps_since_lane_change = cooldown
         self.last_lane_action = None
@@ -95,6 +104,9 @@ class ActionSmoother:
             return action
     
     def reset(self):
+        """
+        reset.
+        """
         self.steps_since_lane_change = self.cooldown
         self.last_lane_action = None
 

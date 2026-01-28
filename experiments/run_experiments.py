@@ -21,6 +21,9 @@ from src.env import create_env_with_reward_shaping
 
 
 def parse_args():
+    """
+    parse_args.
+    """
     parser = argparse.ArgumentParser()
     parser.add_argument('--experiment', type=str, required=True,
                         choices=['reward_shaping', 'env_variations'])
@@ -33,6 +36,14 @@ def parse_args():
 
 
 def get_agent(algorithm: str, state_dim: int, action_dim: int):
+    """
+    get_agent.
+    
+    Args:
+        algorithm (str): Parameter.
+        state_dim (int): Parameter.
+        action_dim (int): Parameter.
+    """
     agents = {
         'dqn': DQNAgent,
         'double_dqn': DoubleDQNAgent,
@@ -44,6 +55,14 @@ def get_agent(algorithm: str, state_dim: int, action_dim: int):
 
 
 def evaluate(agent, env, n_episodes=5):
+    """
+    evaluate.
+    
+    Args:
+        agent (Any): Parameter.
+        env (Any): Parameter.
+        n_episodes (Any): Parameter.
+    """
     returns = []
     for _ in range(n_episodes):
         state, _ = env.reset()
@@ -203,6 +222,9 @@ def run_env_variations_experiment(args):
 
 
 def main():
+    """
+    main.
+    """
     args = parse_args()
     
     if args.experiment == 'reward_shaping':

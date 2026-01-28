@@ -8,6 +8,12 @@ class SumTree:
     """Binary tree for efficient priority sampling."""
     
     def __init__(self, capacity: int):
+        """
+        __init__.
+        
+        Args:
+            capacity (int): Parameter.
+        """
         self.capacity = capacity
         self.tree = np.zeros(2 * capacity - 1)
         self.data_pointer = 0
@@ -41,6 +47,12 @@ class SumTree:
     
     @property
     def total(self) -> float:
+        """
+        total.
+        
+        Returns:
+            float: Return value.
+        """
         return self.tree[0]
 
 
@@ -56,6 +68,17 @@ class PrioritizedReplayBuffer:
         beta_end: float = 1.0,
         beta_decay_steps: int = 100000
     ):
+        """
+        __init__.
+        
+        Args:
+            capacity (int): Parameter.
+            state_dim (int): Parameter.
+            alpha (float): Parameter.
+            beta_start (float): Parameter.
+            beta_end (float): Parameter.
+            beta_decay_steps (int): Parameter.
+        """
         self.capacity = capacity
         self.alpha = alpha  # Priority exponent
         self.beta = beta_start  # Importance sampling weight
@@ -135,4 +158,10 @@ class PrioritizedReplayBuffer:
             self.tree.update(idx, priority ** self.alpha)
     
     def __len__(self) -> int:
+        """
+        __len__.
+        
+        Returns:
+            int: Return value.
+        """
         return self.size

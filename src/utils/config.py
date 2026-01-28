@@ -26,6 +26,12 @@ class Config:
     """Configuration wrapper with dot notation access."""
     
     def __init__(self, config_dict: Dict[str, Any]):
+        """
+        __init__.
+        
+        Args:
+            config_dict (Dict[str, Any]): Parameter.
+        """
         for key, value in config_dict.items():
             if isinstance(value, dict):
                 setattr(self, key, Config(value))
@@ -43,6 +49,9 @@ class Config:
         return result
     
     def __repr__(self):
+        """
+        __repr__.
+        """
         return f"Config({self.to_dict()})"
 
 

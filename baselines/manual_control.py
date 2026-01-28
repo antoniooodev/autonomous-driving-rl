@@ -18,6 +18,9 @@ from pathlib import Path
 
 
 def parse_args():
+    """
+    parse_args.
+    """
     parser = argparse.ArgumentParser()
     parser.add_argument('--episodes', type=int, default=10)
     parser.add_argument('--seed', type=int, default=0)

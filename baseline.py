@@ -21,6 +21,9 @@ from typing import Tuple
 
 
 def parse_args():
+    """
+    parse_args.
+    """
     parser = argparse.ArgumentParser(description='Run heuristic baseline')
     parser.add_argument('--episodes', type=int, default=10,
                         help='Number of evaluation episodes')

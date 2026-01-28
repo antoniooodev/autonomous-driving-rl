@@ -73,6 +73,9 @@ source .venv/bin/activate  # On Windows: .venv\Scripts\activate
 
 # Install dependencies
 pip install -r requirements.txt
+
+# Install dependencies for CUDA
+pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu121
 ```
 
 ### Dependencies
@@ -131,6 +134,16 @@ python training.py --algorithm ppo --max_steps 50000
 ```bash
 # TTC Heuristic and Random baseline
 python scripts/evaluate_baselines.py
+
+# Generate plots from baseline results
+python scripts/plot_results.py --baseline_return xx.xx
+```
+
+### Run Manual Control
+
+```bash
+# Manual control baseline
+python baseline/manual_control.py
 ```
 
 ---

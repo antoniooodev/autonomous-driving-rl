@@ -9,6 +9,16 @@ class RolloutBuffer:
     """Stores rollout data for PPO training."""
 
     def __init__(self, n_steps: int, num_envs: int, state_dim: int, gamma: float = 0.99, gae_lambda: float = 0.95):
+        """
+        __init__.
+        
+        Args:
+            n_steps (int): Parameter.
+            num_envs (int): Parameter.
+            state_dim (int): Parameter.
+            gamma (float): Parameter.
+            gae_lambda (float): Parameter.
+        """
         self.n_steps = int(n_steps)
         self.num_envs = int(num_envs)
         self.state_dim = int(state_dim)
@@ -62,12 +72,34 @@ class RolloutBuffer:
         self.returns[:self.ptr] = self.advantages[:self.ptr] + self.values[:self.ptr]
 
     def advantages_flat(self) -> np.ndarray:
+        """
+        advantages_flat.
+        
+        Returns:
+            np.ndarray: Return value.
+        """
         return self.advantages[:self.ptr].reshape(-1)
 
     def set_advantages_flat(self, adv: np.ndarray):
+        """
+        set_advantages_flat.
+        
+        Args:
+            adv (np.ndarray): Parameter.
+        """
         self.advantages[:self.ptr] = adv.reshape(self.ptr, self.num_envs)
 
     def get(self, batch_size: int, device: torch.device) -> Generator[Tuple[torch.Tensor, ...], None, None]:
+        """
+        get.
+        
+        Args:
+            batch_size (int): Parameter.
+            device (torch.device): Parameter.
+        
+        Returns:
+            Generator[Tuple[torch.Tensor, ...], None, None]: Return value.
+        """
         total = self.ptr * self.num_envs
 
         states = self.states[:self.ptr].reshape(total, self.state_dim)

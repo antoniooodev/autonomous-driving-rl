@@ -8,6 +8,12 @@ class RewardShapingWrapper(gym.RewardWrapper):
     """Base class for reward shaping."""
     
     def reward(self, reward):
+        """
+        reward.
+        
+        Args:
+            reward (Any): Parameter.
+        """
         return reward
 
 
@@ -15,11 +21,25 @@ class TTCRewardWrapper(gym.Wrapper):
     """Add Time-To-Collision penalty to reward."""
     
     def __init__(self, env, ttc_threshold: float = 3.0, ttc_penalty: float = 0.1):
+        """
+        __init__.
+        
+        Args:
+            env (Any): Parameter.
+            ttc_threshold (float): Parameter.
+            ttc_penalty (float): Parameter.
+        """
         super().__init__(env)
         self.ttc_threshold = ttc_threshold
         self.ttc_penalty = ttc_penalty
     
     def step(self, action):
+        """
+        step.
+        
+        Args:
+            action (Any): Parameter.
+        """
         obs, reward, done, truncated, info = self.env.step(action)
         
         # Compute TTC penalty from observation
@@ -78,6 +98,17 @@ class SmoothnessRewardWrapper(gym.Wrapper):
         safe_distance: float = 0.1,
         slow_vehicle_threshold: float = -0.02
     ):
+        """
+        __init__.
+        
+        Args:
+            env (Any): Parameter.
+            unnecessary_lane_change_penalty (float): Parameter.
+            right_lane_bonus (float): Parameter.
+            zigzag_penalty (float): Parameter.
+            safe_distance (float): Parameter.
+            slow_vehicle_threshold (float): Parameter.
+        """
         super().__init__(env)
         self.unnecessary_lc_penalty = unnecessary_lane_change_penalty
         self.right_lane_bonus = right_lane_bonus
@@ -87,6 +118,12 @@ class SmoothnessRewardWrapper(gym.Wrapper):
         self.last_action = None
     
     def step(self, action):
+        """
+        step.
+        
+        Args:
+            action (Any): Parameter.
+        """
         obs, reward, done, truncated, info = self.env.step(action)
         
         shaped_reward = reward
@@ -159,6 +196,12 @@ class SmoothnessRewardWrapper(gym.Wrapper):
         return False
     
     def reset(self, **kwargs):
+        """
+        reset.
+        
+        Args:
+            **kwargs (Any): Parameter.
+        """
         self.last_action = None
         return self.env.reset(**kwargs)
 
@@ -189,6 +232,18 @@ class CompositeRewardWrapper(gym.Wrapper):
         zigzag_penalty: float = 0.3,
         speed_bonus_scale: float = 1.0
     ):
+        """
+        __init__.
+        
+        Args:
+            env (Any): Parameter.
+            ttc_penalty (float): Parameter.
+            ttc_threshold (float): Parameter.
+            unnecessary_lc_penalty (float): Parameter.
+            right_lane_bonus (float): Parameter.
+            zigzag_penalty (float): Parameter.
+            speed_bonus_scale (float): Parameter.
+        """
         super().__init__(env)
         self.ttc_penalty = ttc_penalty
         self.ttc_threshold = ttc_threshold
@@ -199,6 +254,12 @@ class CompositeRewardWrapper(gym.Wrapper):
         self.last_action = None
     
     def step(self, action):
+        """
+        step.
+        
+        Args:
+            action (Any): Parameter.
+        """
         obs, reward, done, truncated, info = self.env.step(action)
         
         shaped_reward = reward * self.speed_bonus_scale
@@ -232,6 +293,12 @@ class CompositeRewardWrapper(gym.Wrapper):
         return obs, shaped_reward, done, truncated, info
     
     def _compute_ttc_penalty(self, state_matrix):
+        """
+        _compute_ttc_penalty.
+        
+        Args:
+            state_matrix (Any): Parameter.
+        """
         min_ttc = float('inf')
         for i in range(1, 5):
             presence, x, y, vx, vy = state_matrix[i]
@@ -262,6 +329,12 @@ class CompositeRewardWrapper(gym.Wrapper):
         return False
     
     def reset(self, **kwargs):
+        """
+        reset.
+        
+        Args:
+            **kwargs (Any): Parameter.
+        """
         self.last_action = None
         return self.env.reset(**kwargs)
 

@@ -8,6 +8,13 @@ class ReplayBuffer:
     """Standard experience replay buffer with uniform sampling."""
     
     def __init__(self, capacity: int, state_dim: int):
+        """
+        __init__.
+        
+        Args:
+            capacity (int): Parameter.
+            state_dim (int): Parameter.
+        """
         self.capacity = capacity
         self.ptr = 0
         self.size = 0
@@ -50,4 +57,10 @@ class ReplayBuffer:
         )
     
     def __len__(self) -> int:
+        """
+        __len__.
+        
+        Returns:
+            int: Return value.
+        """
         return self.size

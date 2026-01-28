@@ -15,6 +15,15 @@ class MLP(nn.Module):
         hidden_dims: List[int] = [256, 256],
         activation: str = "relu"
     ):
+        """
+        __init__.
+        
+        Args:
+            input_dim (int): Parameter.
+            output_dim (int): Parameter.
+            hidden_dims (List[int]): Parameter.
+            activation (str): Parameter.
+        """
         super().__init__()
         
         # Select activation function
@@ -49,6 +58,15 @@ class MLP(nn.Module):
                 nn.init.zeros_(layer.bias)
     
     def forward(self, x: torch.Tensor) -> torch.Tensor:
+        """
+        forward.
+        
+        Args:
+            x (torch.Tensor): Parameter.
+        
+        Returns:
+            torch.Tensor: Return value.
+        """
         return self.network(x)
 
 

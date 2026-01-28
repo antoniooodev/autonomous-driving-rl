@@ -33,6 +33,27 @@ class D3QNAgent(BaseAgent):
         beta_frames: int = 100000,
         device: str = "auto"
     ):
+        """
+        __init__.
+        
+        Args:
+            state_dim (int): Parameter.
+            action_dim (int): Parameter.
+            hidden_dims (list): Parameter.
+            lr (float): Parameter.
+            gamma (float): Parameter.
+            epsilon_start (float): Parameter.
+            epsilon_end (float): Parameter.
+            epsilon_decay_steps (int): Parameter.
+            buffer_size (int): Parameter.
+            batch_size (int): Parameter.
+            learning_starts (int): Parameter.
+            target_update_freq (int): Parameter.
+            alpha (float): Parameter.
+            beta_start (float): Parameter.
+            beta_frames (int): Parameter.
+            device (str): Parameter.
+        """
         super().__init__(state_dim, action_dim, device)
         
         self.gamma = gamma
@@ -56,6 +77,16 @@ class D3QNAgent(BaseAgent):
         self.train_steps = 0
     
     def select_action(self, state: np.ndarray, evaluate: bool = False) -> int:
+        """
+        select_action.
+        
+        Args:
+            state (np.ndarray): Parameter.
+            evaluate (bool): Parameter.
+        
+        Returns:
+            int: Return value.
+        """
         if not evaluate and np.random.random() < self.epsilon:
             return np.random.randint(self.action_dim)
         
@@ -89,9 +120,25 @@ class D3QNAgent(BaseAgent):
         return actions
     
     def store_transition(self, state, action, reward, next_state, done):
+        """
+        store_transition.
+        
+        Args:
+            state (Any): Parameter.
+            action (Any): Parameter.
+            reward (Any): Parameter.
+            next_state (Any): Parameter.
+            done (Any): Parameter.
+        """
         self.buffer.push(state, action, reward, next_state, done)
     
     def train_step(self) -> Optional[dict]:
+        """
+        train_step.
+        
+        Returns:
+            Optional[dict]: Return value.
+        """
         if len(self.buffer) < self.learning_starts:
             return None
         
@@ -131,6 +178,12 @@ class D3QNAgent(BaseAgent):
         return {"loss": loss.item(), "epsilon": self.epsilon}
     
     def save(self, path: str):
+        """
+        save.
+        
+        Args:
+            path (str): Parameter.
+        """
         torch.save({
             'q_network': self.q_network.state_dict(),
             'target_network': self.target_network.state_dict(),
@@ -140,6 +193,12 @@ class D3QNAgent(BaseAgent):
         }, path)
     
     def load(self, path: str):
+        """
+        load.
+        
+        Args:
+            path (str): Parameter.
+        """
         checkpoint = torch.load(path, map_location=self.device)
         self.q_network.load_state_dict(checkpoint['q_network'])
         self.target_network.load_state_dict(checkpoint['target_network'])

@@ -24,6 +24,15 @@ class Logger:
         use_csv: bool = True
     ):
         # Create experiment directory
+        """
+        __init__.
+        
+        Args:
+            log_dir (str): Parameter.
+            experiment_name (Optional[str]): Parameter.
+            use_tensorboard (bool): Parameter.
+            use_csv (bool): Parameter.
+        """
         if experiment_name is None:
             experiment_name = datetime.now().strftime("%Y%m%d_%H%M%S")
         

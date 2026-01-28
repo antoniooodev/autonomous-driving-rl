@@ -21,6 +21,9 @@ from src.agents import DQNAgent, DoubleDQNAgent, DuelingDQNAgent, D3QNAgent, PPO
 
 
 def parse_args():
+    """
+    parse_args.
+    """
     parser = argparse.ArgumentParser()
     parser.add_argument('--algorithms', nargs='+', 
                         default=['dqn', 'double_dqn', 'dueling_dqn', 'd3qn', 'ppo'])
@@ -105,6 +108,9 @@ def find_weights(algorithm: str, weights_dir: Path, checkpoints_dir: Path):
 
 
 def main():
+    """
+    main.
+    """
     args = parse_args()
     set_seed(args.seed)
     

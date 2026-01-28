@@ -14,6 +14,9 @@ import shutil
 
 
 def parse_args():
+    """
+    parse_args.
+    """
     parser = argparse.ArgumentParser()
     parser.add_argument('--algorithms', nargs='+',
                         default=['dqn', 'double_dqn', 'dueling_dqn', 'd3qn', 'ppo'])
@@ -23,6 +26,9 @@ def parse_args():
 
 
 def main():
+    """
+    main.
+    """
     args = parse_args()
     
     print("="*60)

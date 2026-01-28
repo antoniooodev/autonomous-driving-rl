@@ -23,6 +23,9 @@ from src.env import SmoothnessRewardWrapper, CompositeRewardWrapper
 
 
 def get_device():
+    """
+    get_device.
+    """
     if torch.cuda.is_available():
         return "cuda"
     if torch.backends.mps.is_available():
@@ -31,6 +34,9 @@ def get_device():
 
 
 def parse_args():
+    """
+    parse_args.
+    """
     parser = argparse.ArgumentParser()
     parser.add_argument('--algorithm', type=str, default='dqn',
                         choices=['dqn', 'double_dqn', 'dueling_dqn', 'd3qn', 'ppo'])
@@ -53,6 +59,14 @@ def parse_args():
 
 
 def create_env(env_name: str, config: dict, reward_shaping: str = 'none'):
+    """
+    create_env.
+    
+    Args:
+        env_name (str): Parameter.
+        config (dict): Parameter.
+        reward_shaping (str): Parameter.
+    """
     env = gymnasium.make(env_name, config=config)
 
     if reward_shaping == 'smooth':
@@ -68,6 +82,15 @@ def create_env(env_name: str, config: dict, reward_shaping: str = 'none'):
 
 
 def evaluate_agent(agent, env_name: str, config: dict, n_episodes: int = 5):
+    """
+    evaluate_agent.
+    
+    Args:
+        agent (Any): Parameter.
+        env_name (str): Parameter.
+        config (dict): Parameter.
+        n_episodes (int): Parameter.
+    """
     env = create_env(env_name, config)
     returns = []
 
@@ -90,6 +113,18 @@ def evaluate_agent(agent, env_name: str, config: dict, n_episodes: int = 5):
 
 
 def get_agent(algorithm: str, state_dim: int, action_dim: int, device: str = "auto"):
+    """
+    get_agent.
+    
+    Args:
+        algorithm (str): Parameter.
+        state_dim (int): Parameter.
+        action_dim (int): Parameter.
+        device (str): Parameter.
+    
+    Raises:
+        NotImplementedError: If an error condition occurs.
+    """
     if algorithm == 'dqn':
         return DQNAgent(state_dim, action_dim, device=device)
     if algorithm == 'double_dqn':
@@ -104,6 +139,12 @@ def get_agent(algorithm: str, state_dim: int, action_dim: int, device: str = "au
 
 
 def resolve_device(requested: str):
+    """
+    resolve_device.
+    
+    Args:
+        requested (str): Parameter.
+    """
     if requested != "auto":
         if requested == "cuda" and not torch.cuda.is_available():
             return "cpu"
@@ -114,6 +155,9 @@ def resolve_device(requested: str):
 
 
 def configure_cuda():
+    """
+    configure_cuda.
+    """
     torch.backends.cudnn.benchmark = True
     torch.backends.cuda.matmul.allow_tf32 = True
     torch.backends.cudnn.allow_tf32 = True
@@ -122,8 +166,28 @@ def configure_cuda():
 
 
 def make_vector_env(env_name: str, env_config: dict, reward_shaping: str, num_envs: int, base_seed: int, backend: str):
+    """
+    make_vector_env.
+    
+    Args:
+        env_name (str): Parameter.
+        env_config (dict): Parameter.
+        reward_shaping (str): Parameter.
+        num_envs (int): Parameter.
+        base_seed (int): Parameter.
+        backend (str): Parameter.
+    """
     def make_one(rank: int):
+        """
+        make_one.
+        
+        Args:
+            rank (int): Parameter.
+        """
         def thunk():
+            """
+            thunk.
+            """
             env = create_env(env_name, env_config, reward_shaping)
             env.reset(seed=base_seed + rank)
             return env
@@ -137,6 +201,14 @@ def make_vector_env(env_name: str, env_config: dict, reward_shaping: str, num_en
 
 
 def select_actions(agent, states, evaluate: bool = False):
+    """
+    select_actions.
+    
+    Args:
+        agent (Any): Parameter.
+        states (Any): Parameter.
+        evaluate (bool): Parameter.
+    """
     if hasattr(agent, "select_action_batch"):
         return agent.select_action_batch(states, evaluate=evaluate)
     actions = []
@@ -146,6 +218,14 @@ def select_actions(agent, states, evaluate: bool = False):
 
 
 def train_single(args, device: str, env_config: dict):
+    """
+    train_single.
+    
+    Args:
+        args (Any): Parameter.
+        device (str): Parameter.
+        env_config (dict): Parameter.
+    """
     env = create_env("highway-v0", env_config, args.reward_shaping)
     state_dim = env.observation_space.shape[0] * env.observation_space.shape[1]
     action_dim = env.action_space.n
@@ -216,6 +296,15 @@ def train_single(args, device: str, env_config: dict):
 
 
 def train_vectorized(args, device: str, env_config: dict, num_envs: int):
+    """
+    train_vectorized.
+    
+    Args:
+        args (Any): Parameter.
+        device (str): Parameter.
+        env_config (dict): Parameter.
+        num_envs (int): Parameter.
+    """
     backend = args.vector_backend
     env = make_vector_env("highway-v0", env_config, args.reward_shaping, num_envs, args.seed, backend)
 
@@ -335,6 +424,12 @@ def train_vectorized(args, device: str, env_config: dict, num_envs: int):
 
 
 def train(args):
+    """
+    train.
+    
+    Args:
+        args (Any): Parameter.
+    """
     set_seed(args.seed)
 
     device = resolve_device(args.device)

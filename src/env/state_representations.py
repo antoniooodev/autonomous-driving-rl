@@ -9,6 +9,12 @@ class FlattenObservation(gym.ObservationWrapper):
     """Flatten observation to 1D vector."""
     
     def __init__(self, env):
+        """
+        __init__.
+        
+        Args:
+            env (Any): Parameter.
+        """
         super().__init__(env)
         obs_shape = env.observation_space.shape
         self.observation_space = spaces.Box(
@@ -18,6 +24,12 @@ class FlattenObservation(gym.ObservationWrapper):
         )
     
     def observation(self, obs):
+        """
+        observation.
+        
+        Args:
+            obs (Any): Parameter.
+        """
         return obs.reshape(-1).astype(np.float32)
 
 
@@ -25,6 +37,15 @@ class OccupancyGridWrapper(gym.ObservationWrapper):
     """Convert kinematics to occupancy grid representation."""
     
     def __init__(self, env, grid_size=(32, 32), x_range=(-50, 50), y_range=(-10, 10)):
+        """
+        __init__.
+        
+        Args:
+            env (Any): Parameter.
+            grid_size (Any): Parameter.
+            x_range (Any): Parameter.
+            y_range (Any): Parameter.
+        """
         super().__init__(env)
         self.grid_size = grid_size
         self.x_range = x_range
@@ -37,6 +58,12 @@ class OccupancyGridWrapper(gym.ObservationWrapper):
         )
     
     def observation(self, obs):
+        """
+        observation.
+        
+        Args:
+            obs (Any): Parameter.
+        """
         grid = np.zeros(self.grid_size, dtype=np.float32)
         
         # obs shape: (vehicles, features) where features = [presence, x, y, vx, vy]
@@ -66,6 +93,12 @@ class GrayscaleObservation(gym.ObservationWrapper):
     """Use grayscale image observation."""
     
     def __init__(self, env):
+        """
+        __init__.
+        
+        Args:
+            env (Any): Parameter.
+        """
         super().__init__(env)
         # Assume env is configured with GrayscaleObservation
         # Shape will be (height, width)
@@ -73,6 +106,12 @@ class GrayscaleObservation(gym.ObservationWrapper):
     
     def observation(self, obs):
         # Normalize to [0, 1]
+        """
+        observation.
+        
+        Args:
+            obs (Any): Parameter.
+        """
         return obs.astype(np.float32) / 255.0
 
 

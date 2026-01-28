@@ -30,6 +30,24 @@ class DQNAgent(BaseAgent):
         target_update_freq: int = 100,
         device: str = "auto"
     ):
+        """
+        __init__.
+        
+        Args:
+            state_dim (int): Parameter.
+            action_dim (int): Parameter.
+            hidden_dims (list): Parameter.
+            lr (float): Parameter.
+            gamma (float): Parameter.
+            epsilon_start (float): Parameter.
+            epsilon_end (float): Parameter.
+            epsilon_decay_steps (int): Parameter.
+            buffer_size (int): Parameter.
+            batch_size (int): Parameter.
+            learning_starts (int): Parameter.
+            target_update_freq (int): Parameter.
+            device (str): Parameter.
+        """
         super().__init__(state_dim, action_dim, device)
         
         self.gamma = gamma

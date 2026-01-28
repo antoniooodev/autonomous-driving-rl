@@ -31,6 +31,25 @@ class PPOAgent(BaseAgent):
         batch_size: int = 256,
         hidden_dims=(64, 64),
     ):
+        """
+        __init__.
+        
+        Args:
+            state_dim (int): Parameter.
+            action_dim (int): Parameter.
+            device (str): Parameter.
+            lr (float): Parameter.
+            gamma (float): Parameter.
+            gae_lambda (float): Parameter.
+            clip_epsilon (float): Parameter.
+            value_coef (float): Parameter.
+            entropy_coef (float): Parameter.
+            max_grad_norm (float): Parameter.
+            n_steps (int): Parameter.
+            n_epochs (int): Parameter.
+            batch_size (int): Parameter.
+            hidden_dims (Any): Parameter.
+        """
         super().__init__(state_dim, action_dim, device)
 
         # Hyperparameters
@@ -64,6 +83,12 @@ class PPOAgent(BaseAgent):
         self.train_steps = 0
 
     def set_num_envs(self, num_envs: int):
+        """
+        set_num_envs.
+        
+        Args:
+            num_envs (int): Parameter.
+        """
         self.num_envs = max(1, int(num_envs))
         self._last_values = np.zeros(self.num_envs, dtype=np.float32)
         self._last_log_probs = np.zeros(self.num_envs, dtype=np.float32)
@@ -194,6 +219,12 @@ class PPOAgent(BaseAgent):
         }
 
     def save(self, path: str):
+        """
+        save.
+        
+        Args:
+            path (str): Parameter.
+        """
         torch.save({
             "network": self.network.state_dict(),
             "optimizer": self.optimizer.state_dict(),
@@ -201,6 +232,12 @@ class PPOAgent(BaseAgent):
         }, path)
 
     def load(self, path: str):
+        """
+        load.
+        
+        Args:
+            path (str): Parameter.
+        """
         checkpoint = torch.load(path, map_location=self.device)
         self.network.load_state_dict(checkpoint["network"])
         self.optimizer.load_state_dict(checkpoint["optimizer"])

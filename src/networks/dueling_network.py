@@ -20,6 +20,14 @@ class DuelingNetwork(nn.Module):
         output_dim: int,
         hidden_dims: List[int] = [256, 256]
     ):
+        """
+        __init__.
+        
+        Args:
+            input_dim (int): Parameter.
+            output_dim (int): Parameter.
+            hidden_dims (List[int]): Parameter.
+        """
         super().__init__()
         
         # Shared feature layer
@@ -45,12 +53,24 @@ class DuelingNetwork(nn.Module):
         self._init_weights()
     
     def _init_weights(self):
+        """
+        _init_weights.
+        """
         for module in self.modules():
             if isinstance(module, nn.Linear):
                 nn.init.orthogonal_(module.weight, gain=np.sqrt(2))
                 nn.init.zeros_(module.bias)
     
     def forward(self, x: torch.Tensor) -> torch.Tensor:
+        """
+        forward.
+        
+        Args:
+            x (torch.Tensor): Parameter.
+        
+        Returns:
+            torch.Tensor: Return value.
+        """
         features = self.feature_layer(x)
         value = self.value_stream(features)
         advantage = self.advantage_stream(features)

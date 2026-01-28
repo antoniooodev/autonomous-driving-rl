@@ -15,6 +15,14 @@ class BaseAgent(ABC):
         action_dim: int,
         device: str = "auto"
     ):
+        """
+        __init__.
+        
+        Args:
+            state_dim (int): Parameter.
+            action_dim (int): Parameter.
+            device (str): Parameter.
+        """
         self.state_dim = state_dim
         self.action_dim = action_dim
         

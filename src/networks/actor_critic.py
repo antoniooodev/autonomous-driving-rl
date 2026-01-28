@@ -16,6 +16,14 @@ class ActorCritic(nn.Module):
         action_dim: int,
         hidden_dims: List[int] = [256, 256]
     ):
+        """
+        __init__.
+        
+        Args:
+            state_dim (int): Parameter.
+            action_dim (int): Parameter.
+            hidden_dims (List[int]): Parameter.
+        """
         super().__init__()
         
         # Shared feature extractor
@@ -41,6 +49,9 @@ class ActorCritic(nn.Module):
         self._init_weights()
     
     def _init_weights(self):
+        """
+        _init_weights.
+        """
         for module in self.modules():
             if isinstance(module, nn.Linear):
                 nn.init.orthogonal_(module.weight, gain=np.sqrt(2))

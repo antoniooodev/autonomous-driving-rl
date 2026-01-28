@@ -14,6 +14,9 @@ from pathlib import Path
 
 
 def parse_args():
+    """
+    parse_args.
+    """
     parser = argparse.ArgumentParser()
     parser.add_argument('--log_dir', type=str, default='results/logs')
     parser.add_argument('--output_dir', type=str, default='results/plots')
@@ -229,6 +232,9 @@ def generate_summary_table(log_dir: Path, output_dir: Path, algorithms: list):
 
 
 def main():
+    """
+    main.
+    """
     args = parse_args()
     log_dir = Path(args.log_dir)
     output_dir = Path(args.output_dir)

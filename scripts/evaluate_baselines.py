@@ -27,11 +27,25 @@ class TTCHeuristicPolicy:
     SLOWER = 4
     
     def __init__(self, ttc_threshold=3.0, safe_distance=0.15, lane_change_threshold=0.1):
+        """
+        __init__.
+        
+        Args:
+            ttc_threshold (Any): Parameter.
+            safe_distance (Any): Parameter.
+            lane_change_threshold (Any): Parameter.
+        """
         self.ttc_threshold = ttc_threshold
         self.safe_distance = safe_distance
         self.lane_change_threshold = lane_change_threshold
     
     def select_action(self, state):
+        """
+        select_action.
+        
+        Args:
+            state (Any): Parameter.
+        """
         state_matrix = state.reshape(5, 5)
         vehicles = self._get_vehicles_by_lane(state_matrix)
         min_ttc, min_distance = self._get_min_ttc_ahead(vehicles['same'])
@@ -53,6 +67,12 @@ class TTCHeuristicPolicy:
         return self.IDLE
     
     def _get_vehicles_by_lane(self, state_matrix):
+        """
+        _get_vehicles_by_lane.
+        
+        Args:
+            state_matrix (Any): Parameter.
+        """
         vehicles = {'left': [], 'same': [], 'right': []}
         for i in range(1, 5):
             presence, x, y, vx, vy = state_matrix[i]
@@ -68,6 +88,12 @@ class TTCHeuristicPolicy:
         return vehicles
     
     def _is_lane_safe(self, vehicles):
+        """
+        _is_lane_safe.
+        
+        Args:
+            vehicles (Any): Parameter.
+        """
         for v in vehicles:
             if v['x'] > 0 and v['x'] < self.safe_distance * 2:
                 return False
@@ -76,6 +102,12 @@ class TTCHeuristicPolicy:
         return True
     
     def _get_min_ttc_ahead(self, vehicles):
+        """
+        _get_min_ttc_ahead.
+        
+        Args:
+            vehicles (Any): Parameter.
+        """
         min_ttc = float('inf')
         min_distance = float('inf')
         for v in vehicles:
@@ -90,13 +122,28 @@ class TTCHeuristicPolicy:
 class RandomPolicy:
     """Random action policy."""
     def __init__(self, action_dim=5):
+        """
+        __init__.
+        
+        Args:
+            action_dim (Any): Parameter.
+        """
         self.action_dim = action_dim
     
     def select_action(self, state):
+        """
+        select_action.
+        
+        Args:
+            state (Any): Parameter.
+        """
         return np.random.randint(self.action_dim)
 
 
 def parse_args():
+    """
+    parse_args.
+    """
     parser = argparse.ArgumentParser()
     parser.add_argument('--episodes', type=int, default=100)
     parser.add_argument('--seed', type=int, default=0)
@@ -142,6 +189,9 @@ def evaluate_policy(policy, env, n_episodes, desc="Evaluating"):
 
 
 def main():
+    """
+    main.
+    """
     args = parse_args()
     np.random.seed(args.seed)
     
