@@ -1,8 +1,9 @@
 # Autonomous Highway Driving with Deep Reinforcement Learning
 
 <p align="center">
-  <img src="https://raw.githubusercontent.com/eleurent/highway-env/gh-media/docs/media/highway-env.gif?raw=true" alt="Highway Driving Demo" width="600"/>
+<img src="https://raw.githubusercontent.com/eleurent/highway-env/gh-media/docs/media/highway-env.gif?raw=true" alt="Highway Driving Demo" width="600"/>
 </p>
+<p align="center"><em>Figure: Illustrative example of the Highway environment (official <code>highway-env</code> demo animation); shown for visualization only and not generated from my experiments.</em></p>
 
 <p align="center">
   <a href="#installation">Installation</a> •
@@ -143,7 +144,7 @@ python scripts/plot_results.py --baseline_return xx.xx
 
 ```bash
 # Manual control baseline
-python baseline/manual_control.py
+python baselines/manual_control.py
 ```
 
 ---
